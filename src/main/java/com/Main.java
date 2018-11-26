@@ -18,38 +18,27 @@ import java.util.Properties;
 
 public class Main {
     private final static String PROPERTY_NAME = "config.properties";
+
     public static void main(String[] args) throws Exception {
         Properties properties = readProperties();
         HttpTransportClient client = new HttpTransportClient();
         VkApiClient apiClient = new VkApiClient(client);
 
-        GroupActor actor = initVkApi(apiClient, properties);
+        GroupActor actor = initVkApi(properties);
+
 
         GroupsGetLongPollServerQuery query = apiClient.groups().getLongPollServer(actor);
         GetLongPollServerResponse data = query.execute();
-        //System.out.println(data.getServer() + data.getKey() + data.getTs());
         BotRequestHandler botHandler = new BotRequestHandler(apiClient, actor);
         RequestHandler handler = new RequestHandler(botHandler);
         handler.handle(data.getServer(), data.getKey(), data.getTs());
-/*
-        Server server = new Server(8080);
-
-
-
-        server.setHandler(new RequestHandler(botHandler));
-
-        server.start();
-        server.join();
-*/
     }
 
-    private static GroupActor initVkApi(VkApiClient apiClient, Properties properties) throws ClientException, ApiException {
-
+    private static GroupActor initVkApi(Properties properties){
         String token = properties.getProperty("token");
         int groupId = Integer.parseInt(properties.getProperty("groupId"));
         if (groupId == 0 || token == null) throw new RuntimeException("Params are not set");
         GroupActor actor = new GroupActor(groupId, token);
-
 
         return actor;
     }

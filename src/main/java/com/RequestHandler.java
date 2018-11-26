@@ -29,9 +29,9 @@ public class RequestHandler {
     public void handle(String url, String key, int ts_int) throws IOException {
 //{$server}?act=a_check&key={$key}&ts={$ts}&wait=25
         String ts = ts_int + "";
+        HttpClient client = HttpClientBuilder.create().build();
         while (true) {
             //String url = server; // + "?act=a_check&key=" + key + "&ts" + ts + "&wait=50";
-            HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = new HttpPost(url);
             post.setHeader("Referer", "https://vk.com");
             post.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36");
@@ -50,12 +50,6 @@ public class RequestHandler {
             JsonObject requestJson = gson.fromJson(rd, JsonObject.class);
             ts = requestJson.get("ts").getAsString();
             JsonArray updates = requestJson.get("updates").getAsJsonArray();
-//            String line = "";
-//            while ((line = rd.readLine()) != null) {
-//                result.append(line);
-//            }
-//            System.out.println(result);
-            //System.out.println(updates);
             /*
 [{"type":"message_new","object":{"date":1541848293,"from_id":81792031,"id":0,"out":0,"peer_id":2000000001,"text":".","conversation_message_id":94,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false},"group_id":172829412}]
 массив
@@ -67,16 +61,15 @@ public class RequestHandler {
                 switch (type) {
                     case MESSAGE_TYPE:
                         JsonObject object = jsonObject.getAsJsonObject("object");
-                      //  System.out.println(object.toString());
 /*
 json выглядит так
 {"date":1541844781,"from_id":81792031,"id":7,"out":0,"peer_id":81792031,"text":"dfsf","conversation_message_id":7,"fwd_messages":[],"important":false,"random_id":0,"attachments":[],"is_hidden":false}
 */
-                        int userId = object.getAsJsonPrimitive("from_id").getAsInt();
+                        //int userId = object.getAsJsonPrimitive("from_id").getAsInt();
                         //достеём айди пользователя
-                        int peerId = object.getAsJsonPrimitive("peer_id").getAsInt();
+                        //int peerId = object.getAsJsonPrimitive("peer_id").getAsInt();
                         //если меньше 2ккк - айди пользователя, если больше - айди беседы + 2ккк
-                        botRequestHandler.handle(userId, peerId);
+                        botRequestHandler.handle(object);
                         break;
                     default:
                         break;
